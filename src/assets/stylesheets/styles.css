@@ -1,0 +1,91 @@
+.hal-9000 {
+    background: #f9d080;
+    border: 12px #ff3c5c solid;
+    border-radius: 90px;
+    -webkit-box-shadow: 0 0 40px #ff3c5c;
+    box-shadow: 0 0 40px #ff3c5c;
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+}
+
+.loading-spinner {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.loading-spinner .hal-9000 {
+    /*-webkit-animation: scale-in-center 0.25s*/
+    /*cubic-bezier(0.455, 0.030, 0.515, 0.955) infinite alternate both;*/
+    /*animation: scale-in-center 0.25s*/
+    /*cubic-bezier(0.455, 0.030, 0.515, 0.955) infinite alternate both;*/
+
+    -webkit-animation: ping 0.8s cubic-bezier(0.785, 0.135, 0.150, 0.860) infinite forwards;
+    animation: ping 0.8s cubic-bezier(0.785, 0.135, 0.150, 0.860) infinite forwards;
+    border: 20px #ff3c5c solid;
+    height: 60px;
+    width: 60px;
+}
+
+@-webkit-keyframes scale-in-center {
+    0% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes scale-in-center {
+    0% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes ping {
+    0% {
+        -webkit-transform: scale(0.2);
+        transform: scale(0.2);
+        opacity: 0.8;
+    }
+    80% {
+        -webkit-transform: scale(1.2);
+        transform: scale(1.2);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: scale(2.2);
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}
+
+@keyframes ping {
+    0% {
+        -webkit-transform: scale(0.2);
+        transform: scale(0.2);
+        opacity: 0.8;
+    }
+    80% {
+        -webkit-transform: scale(1.2);
+        transform: scale(1.2);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: scale(2.2);
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}

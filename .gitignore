@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+node_modules/
+dist/
+config/
+config/database_config.json
+config/twitter_config.json
+database/change_pwd.sh*
+database/neo4j-community-3.5.3/data/databases
+database/neo4j-community-3.5.3/logs

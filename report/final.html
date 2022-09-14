@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>COMSM0104 Web Technologies - Final Report</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="../src/assets/stylesheets/neon-glow.css">-->
+    <link rel="stylesheet" href="../src/assets/stylesheets/styles.css">
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-lg-12">
+            <h1 class="mt-4">COMSM0104 Web Technologies - Final Report</h1>
+
+            <p class="lead">
+                by <a href="#">Justin Salmon and George Lancaster</a>
+            </p>
+            <hr>
+
+            <div class="mb-4 text-justify">
+                <h2>Introduction</h2>
+                <p>
+                    This project aims to visualise relationships between Twitter users. By entering a Twitter username,
+                    recent tweets from that user are downloaded and input into a graph database for processing. This
+                    allows us to apply algorithms like PageRank to gain a richer understanding of the relationships
+                    in the social network. After querying the database, relationships are plotted in an easily
+                    interpretable and interactive graph on the client side.
+                </p>
+                <p>
+                    The application can be accessed at: <a href="http://twitvis.jls.ai/">
+                    http://twitvis.jls.ai/</a>. Alternatively, you can use the embedded iframe below.
+                </p>
+
+                <iframe style="width: 100%; height: 60vh" frameborder="0" src="http://twitvis.jls.ai"></iframe>
+            </div>
+
+            <div class="mb-4 text-justify">
+                <h2>HTML: <code>A+</code></h2>
+                <p>
+                    Our entire website consists of a single dynamically generated HTML page (a so-called
+                    "single-page application"). We use <a href="https://vuejs.org/">Vue.js</a> as the core framework
+                    to generate the page and load/unload components as the user interacts with the site. We like this
+                    idea, as it means that the user's browser never needs to load additional HTML pages - everything is
+                    handled on the client side through dynamic JavaScript. It also means that the application can be
+                    written in a logical and hierarchical way, with a top-level parent component aggregating a tree
+                    of sub-components.
+                </p>
+                <p>
+                    Vue.js starts off by bootstrapping an almost empty HTML page, containing only headers (title,
+                    meta tags, favicon and script tags). It looks for the sole
+                    <code>&lt;div id="app"&gt;&lt;/div&gt;</code> tag and modifies the DOM on-the-fly, replacing it
+                    with a dynamically generated DOM tree.
+                </p>
+                <p>
+                    A Vue.js component is quite unique. It uses special <code>.vue</code> files, which contain a
+                    HTML template, a JavaScript controller class, and a CSS style block. While some would argue that
+                    these three concerns should be strictly separated and hence live in separate files, Vue.js argues
+                    that since components should be small and coherent anyway, it is actually better to keep these
+                    things together to avoid having to waste time searching through e.g. a large CSS file to find the
+                    style for a particular component.
+                </p>
+                <p>
+                    The site currently comprises three main components:
+                </p>
+                <ul>
+                    <li>The <code>HomeComponent</code> is the top-level parent component, which is bound to the root
+                        URL i.e. <code>/</code>. Its job is to house the other components.
+                    </li>
+                    <li>The <code>SearchComponent</code> controls the username search bar at the top of the page.</li>
+                    <li>The <code>GraphComponent</code> controls the main SVG-based node relationship graph. It watches
+                        for changes from the <code>SearchComponent</code> and reloads the graph as necessary.
+                    </li>
+
+                </ul>
+                <p>
+                    We have become very proficient with the Vue.js framework. Since the preliminary version, we have
+                    also implemented an additional component, the <code>UserInfoComponent</code>, which displays an
+                    information box at the top left of the page showing details about the currently selected Twitter
+                    user.
+                </p>
+                <p>
+                    On a side note, this report itself comprises a significant amount of HTML code. Do we get points
+                    for that? :)
+                </p>
+            </div>
+
+            <div class="mb-4 text-justify">
+                <h2>CSS: <code>A</code></h2>
+                <p>
+                    We decided to use the popular open-source <a href="https://getbootstrap.com/">Bootstrap</a>
+                    framework as our base CSS library since it is relatively simple to use yet still powerful enough
+                    for our needs. We wanted a dark, minimalist feel to the site, so we made use of a free and
+                    open-source <a
+                        href="https://hackerthemes.com/bootstrap-themes/demo/neon-glow/">template </a>
+                    that gave us the general look we were aiming for, before adding our own customisations.
+                </p>
+                <p>
+                    We intentionally used CSS to make the main node graph fill the entire screen. We used an absolute
+                    positioning and 100% width/height method to achieve this.
+                </p>
+                <p>
+                    We made a custom loading spinner using pure CSS animations (affectionately named HAL 9000, after the
+                    evil robot from 2001: A Space Odyssey). This is used when loading tweets from the server. Check
+                    him out!
+                </p>
+                <div class="loading-spinner mb-4"
+                     style="text-align: center; position: relative; background-color: #0c0d16; padding: 20px;">
+                    <div class="hal-9000"></div>
+                </div>
+                <p>
+                    Vue.js provides some very nice features when it comes to CSS. As mentioned previously, a
+                    component can be styled in an isolated manner through the use of a style block in the component's
+                    <code>.vue</code> file. These styles are <i>scoped to the component</i>, meaning that one can write
+                    <code>p { color: red; }</code> and it will <i>only</i> affect paragraph tags inside that component.
+                    Very useful.
+                </p>
+                <p>
+                    Vue.js also allows CSS files to be "imported" via JavaScript. This means that e.g. Bootstrap's CSS
+                    can be included simply by running <code>npm install bootstrap</code> and then using <code>import
+                    "bootstrap.css"</code> in the parent component. Vue.js will create the <code>&lt;link /&gt;</code>
+                    tag automatically and include it in the generated HTML file.
+                </p>
+                <p>
+                    We have also made a number of other CSS tweaks to make things look nice, such as using a blurred
+                    version of the user's profile picture as a background on the user info box. This gives a nice
+                    visual continuity effect to the page.
+                </p>
+            </div>
+
+            <div class="mb-4 text-justify">
+                <h2>JS: <code>A+</code></h2>
+                <p>
+                    As mentioned previously, Vue.js generates HTML via client-side JavaScript. Our app uses a number of
+                    Vue components, which comprise a number of JavaScript functions, plus HTML and CSS chunks for the
+                    component.
+                </p>
+                <p>
+                    The <code>GraphComponent</code> is the most interesting from a JavaScript perspective. It is
+                    responsible for reacting to changes in the username search bar (via a two-way binding mechanism)
+                    or to clicks on graph nodes.
+                    On change, the component sets a variable which displays the loading spinner, then makes an
+                    asynchronous call to the backend to fetch data. Following that, it initialises the actual node
+                    graph itself.
+                </p>
+                <p>
+                    The node graph has been implemented using the <a href="https://d3js.org/">D3.js</a> library, a
+                    powerful library for creating SVG-based visualisations. We separated out the implementation of
+                    the D3.js node graph from the Vue.js component into <code>d3-graph.js</code> in a
+                    framework-agnostic manner. It is a vanilla ES6 class, and essentially forms the heart of the
+                    website.
+                </p>
+                <p>
+                    <code>d3-graph.js</code> wraps a D3.js <a href="https://github.com/d3/d3-force">force-directed
+                    graph</a>. Its constructor takes the ID of a HTML element to bind to, and a list of nodes and
+                    edges that will make up the graph. On initialisation, it begins to use the D3.js SVG API to
+                    dynamically create SVG elements on the page. A number of methods are exposed to allow the caller to
+                    supply callback functions for specific events, such as mouseover events on nodes and edges.
+                </p>
+                <p>
+                    The graph has been created to support several features such as zooming, panning, dragging and
+                    mouse hover events. Node radii and edge widths are computed based upon properties of the node graph,
+                    such as in-degree and out-degree. Clicking on a node will result in a new search being
+                    performed, with the clicked user becoming the focus of the graph. The graph will also dynamically
+                    resize itself as the window size changes, meaning it will work on any screen size.
+                </p>
+                <p>
+                    The graph (and the website in general) has been tested on Chrome and Firefox. Support for Firefox
+                    was a little tricky, since it has some quirky behaviour when reporting div sizes during window
+                    resize events.
+                </p>
+                <!--<p>-->
+                <!--In the near future we would like to implement live graph updates, dynamically inserting new nodes-->
+                <!--into the graph as activity happens on Twitter.-->
+                <!--</p>-->
+            </div>
+
+            <div class="mb-4 text-justify">
+                <h2>PNG: <code>A</code></h2>
+                <p>
+                    Our PNG work comprises three main aspects: a custom University of Bristol logo used as a subtle
+                    backdrop to the node graph, a mashup of the Twitter and Neo4J database logos used as a favicon, and
+                    Twitter user avatars displayed on graph nodes.
+                </p>
+
+                <p>
+                    To create the University of Bristol logo, a JPEG version was taken (shown below on the left) and
+                    modified to our needs using GIMP. Firstly, we added an alpha channel to allow having a
+                    transparent background. Then we used the magic wand tool to select and remove all the portions of
+                    white background in the image, which was a fairly detailed operation. Following that, the colour
+                    was inverted to produce a white image, and the edges were trimmed to bring the graphic exactly to
+                    the edges of the canvas. The finished image (shown below on the right) is positioned in the centre
+                    of the window with a 5% opacity to give a nice subtle look.
+                </p>
+                <div style="background-color: #8c8c8c; padding: 10px; text-align: center; margin-bottom: 20px;">
+                    <img width="200px" src="../src/assets/images/uob_arms_monochrome.jpg">
+                    <img width="197px" src="../src/assets/images/uob_arms_monochrome_white.png">
+                </div>
+
+                <p>
+                    A favicon for the website was created by merging the <a
+                        href="https://neo4j.com/style-guide/">Neo4j</a> and <a
+                        href="https://about.twitter.com/en_gb/company/brand-resources.html">Twitter</a>
+                    logos into one. To create the effect of the graph 'wrapping' around the bird, GIMP was used to
+                    create three layers; two for the Twitter bird on the top and bottom layers and one for the Neo4j
+                    graph sandwiched between them. The body of the bird on the top layer was deleted, to make the
+                    graph underneath visible. Additionally, the colours of the green and white dots were changed
+                    to be brighter, and therefore stand out more when used as a favicon. To create the favicon, the
+                    image was scaled down to 16x16px, with many of the pixels manually edited to make it appear as close
+                    to the original image as possible.
+
+                </p>
+                <div style="background-color: #8c8c8c; padding: 10px; text-align: center; margin-bottom: 20px;">
+                    <img width="100px" src="../src/assets/images/logo_neo4j.png">
+                    <span style="font-size: x-large; ">+</span>
+                    <img width="100px" src="../src/assets/images/logo_twitter.png">
+                    <span style="font-size: x-large; ">=</span>
+                    <img width="100px" src="../src/assets/images/logo_bright.png">
+                </div>
+
+                <p>
+                    To give a sense of identity and colour to the application, we also decided to use the Twitter user's
+                    avatar inside the graph nodes themselves. These are loaded from the
+                    <code><a href="https://twivatar.glitch.me/">twivatar</a></code> API.
+                </p>
+            </div>
+
+            <div class="mb-4 text-justify">
+                <h2>SVG: <code>A</code></h2>
+                <p>
+                    We rated this section <code>A</code> because there was a lot of work involved in figuring out how
+                    D3.js generated SVG paths, and how to control it to get the behaviour we wanted. The main body of
+                    our site is in fact <i>one big interactive SVG</i>.
+                </p>
+                <p>
+                    Using the D3.js API, we modified many aspects of the SVGs such as stroke colour and width, node
+                    radii, node fill, click/hover/zoom handlers etc. A major challenge was making the user avatars
+                    (which are retrieved as rectangles) into a circular shape, and scaling them correctly to fit
+                    inside the node based on its size (which is derived from the user's "social importance" in
+                    the graph). This was achieved using a uniquely identified <code>defs</code> element and
+                    corresponding <code>clipPath</code> element for each user avatar to define the image resource and
+                    its desired clipped shape. These are then associated with an <code>image</code> element by ID and
+                    <code>transform</code>-ed into the centre of the parent element to produce the desired effect.
+                </p>
+            </div>
+
+            <div class="mb-4 text-justify">
+                <h2>Server: <code>A+</code></h2>
+                <p>
+                    The web server is based on Express.js. We chose this as it fairly minimalistic, and allowed us to
+                    start development quickly. Our application is an SPA, which means that the web server acts as a
+                    REST API serving data to the browser (or potentially other clients such as a mobile app). The only
+                    exception to this is the index page, which is served as HTML. The production version of the web
+                    server has been deployed to the Oracle cloud. Since no sensitive data is sent from the browser to
+                    the web server, and the it does not require authentication, we did not consider it necessary to
+                    configure HTTPS.
+                </p>
+                <p>
+                    The Twitter API provides a set of function calls that enables access to the Twitter service
+                    programmatically. To use the service, a set of developer keys are required for authentication, and
+                    each key is limited to x requests every thirty minutes. The authentication credentials are stored
+                    in a text file that is not accessible through the web server. Calls to the Twitter API are
+                    performed over TLS by the web server.
+
+                </p>
+                <p>
+                    Currently, entering a username on the front-end returns a graph structure that displays the mentions
+                    of that particular user. The main function of our server is to fetch data from the Twitter API,
+                    store it in the database, and then return the results to the client. In order to do this, the <code>
+                    retrieveTweets </code> function contains a very complex promise resolution hierarchy to get nested
+                    levels of user mentions. The depth of the hierarchy is configurable, and works using a recursive
+                    method.The <code>retrieveTweets </code> function uses an
+                    array of promises, that only resolves when the data for all users at the current depth level have
+                    been retrieved. The function then recursively calls itself, and retrieves all users mentioned by the
+                    previous user. To allow for the data to be plotted once it has been retrieved from the database, it
+                    has been wrangled into a format recognised by the D3.js library used on the front-end.
+                </p>
+                <p>
+                    In addition to limited requests, the Twitter API can sometimes take up to 15 seconds to retrieve
+                    data. To ensure an uninterrupted service, we have implemented caching to reduce the number of calls
+                    made using the Twitter API. This has been done in the <code> checkCache </code> function, that
+                    checks if the user has had their data pulled from Twitter in the past 24 hours. If they have, then
+                    the data is returned from the database without using the Twitter service, thus reducing the usage of
+                    the API.
+                </p>
+                <!--<p>-->
+                <!--In the final version, we plan to implement hashtag searching. This would work in much the same-->
+                <!--way as the current user search, but it will retrieve and display all users who have recently-->
+                <!--tweeted a given hashtag. Given enough time, we may also try to update the mentions in real-time,-->
+                <!--however this involves switching from the current Twitter API to the streaming API. Although the-->
+                <!--server has been deployed on Oracle cloud, it does not yet use https.-->
+                <!--</p>-->
+
+
+            </div>
+
+            <div class="mb-4 text-justify">
+                <h2>Database: <code>A</code></h2>
+                <p>
+                    We used a Neo4j graph database to store the relationships found on Twitter in a network of nodes,
+                    edges and properties. It was chosen as it stores data in much the same way as we planned to
+                    display the results on the webpage. Unlike some NoSQL databases, Neo4j has its own querying language
+                    called Cypher, that allows us to read and write data similarly to an SQL database.
+                </p>
+                <p>
+                    Neo4J has an algorithms library that allows for the calculation of properties such as betweenness
+                    centrality, closeness centrality and more typical algorithms like PageRank. The benefit of using
+                    this library is that it performs all computation on the database, and returns a result without any
+                    code having been written by the programmer. We use the algorithms library to find the users with the
+                    highest importance in the subset of all Twitter users entered into our database. These are
+                    represented visually as the size of the node in the displayed graph (bigger node = higher
+                    importance).
+                </p>
+                <p>
+                    An embedded version of the database is bundled with the application, which weighs about 100MB.
+                    From a security perspective, the default listen address is <code>127.0.0.1</code>, and we wrote a
+                    startup script that changes the default username and password to a secure string. This means that
+                    for local operation, the database is secure. The username and password are stored in plaintext on
+                    disk, which is not ideal, but acceptable for local operation.
+                </p>
+                <p>
+                    The production application uses a hosted version of Neo4J in the Oracle cloud, which is configured
+                    to allow access only from the machine on which the backend is hosted (also in the Oracle
+                    cloud). The cloud platform provides a dynamic networking feature which means that even if the IP
+                    address of either machine changes, the application will still operate in a secure manner. The
+                    username and password of the production database are different to the embedded version, but they
+                    are also stored in plaintext in a config file on the backend server. This is obviously not ideal,
+                    but as it is not possible to access this text file through the web server, the database is secure
+                    to a degree. The database server has been further configured to require TLS client connections
+                    from the backend to ensure credentials are transmitted over a secure connection.
+                </p>
+            </div>
+
+            <div class="mb-4 text-justify">
+                <h2>Dynamic pages: <code>A</code></h2>
+                <p>
+                    The heart of our website, the D3.js node graph, is dynamically populated with data loaded
+                    asynchronously from the backend. We created a REST API which takes a set of query parameters and
+                    fetches the required data from the Twitter API. You can see the REST API in action
+                    <a href="http://129.213.158.149:4000/tweets?username=alan">here</a>.
+
+                </p>
+                <p>
+                    We used the <a href="https://github.com/axios/axios">axios</a> library to handle AJAX calls to
+                    the backend. Axios provides a clean and simple Promise-based interface, and integrates very
+                    nicely with Vue.js (which also promotes the use of promises).
+                </p>
+                <p>
+                    When a user searches for a Twitter username, a <code>GET</code> request is made to the
+                    REST API and a Promise object is created. When the request is complete, the promise is resolved and
+                    the data is passed to the node graph, which uses it to reinitialise itself and redraw the graph.
+                </p>
+                <!--<p>-->
+                <!--For the final website, we plan to go even further with dynamically populated data by including-->
+                <!--additional components which display statistics and other information about the current user.-->
+                <!--</p>-->
+            </div>
+
+            <div class="mb-4 text-justify">
+                <h2>Depth: <code>X</code></h2>
+
+                <p>
+                    The main aim of this project was to use a variety of web technologies to create an
+                    application to visualise the relationships between Twitter users in an interactive graph. To meet
+                    this aim, we implemented three central features:
+                </p>
+                <ol>
+                    <li>A search bar, allowing for data to be retrieved for any Twitter user;</li>
+                    <li>An interactive graph mapping the relationships of the chosen user with other users, where a
+                        larger node indicates a larger amount of communication between the two users;
+                    </li>
+                    <li>A pop-up box that showing information about a user when a node is selected.</li>
+                </ol>
+                <p>
+                    We are particularly proud of the overall aesthetics of our application. We spent a lot of time
+                    tweaking the CSS to make it look and feel the way we wanted. We think the overall effect looks
+                    quite professional and polished, given the fact that neither of us were particularly experienced
+                    with web technologies at the beginning of this assignment. We feel that we have put a lot of hard
+                    work into the application, having each spent several weeks on it.
+                </p>
+
+                <h3>Graph algorithms</h3>
+                <p>
+                    The heart of our application is the Twitter user node graph. This section explains our work on
+                    the graph processing elements of the application in more depth.
+                </p>
+                <p>
+                    In our application, the size of a node is determined by
+                    its 'node centrality'. This is a metric that identifies how
+                    important a node is, based on its degree, i.e. the number of incoming and outgoing links it has.
+                    For a Twitter user, the number of links are based on the number of times a user has mentioned
+                    another user in a tweet. In the context of our application, the importance of a node is
+                    represented by its size. The figure below illustrates this concept.
+                </p>
+                <div style="width:100%; margin: 0 auto; text-align: center; margin-bottom: 10px;">
+
+                    <img style="width: 250px; height: 250px; margin: 0 auto; text-align: center"
+                         src="../src/assets/images/graph.png"/>
+                </div>
+                <p>
+                    The figure above represents the "node centrality" algorithm. There are many other graph
+                    algorithms that calculate other properties, which could potentially also be exported to give
+                    insights into the relationships between Twitter users. Given more time to work on the project, we
+                    would probably go into even greater depth on the database side
+                    and explore how we could visualise the results of the different graph search algorithms.
+                    Currently we only use the node centrality algorithm, but we would like to explore methods to
+                    visualise more advanced algorithms.
+                </p>
+
+                <h3>Further work</h3>
+                <p>
+
+                </p>
+                <p>
+                    We wanted to allow for the depth of the relationships to be configurable on the
+                    front-end. However, as the Twitter API restricts the number of requests to 180 every fifteen
+                    minutes, a depth greater than 5 causes the request limit to be reached quickly, even after
+                    using database caching. This problem could be resolved by using Twitter's premium API to
+                    increase the rate limit, however the lowest cost for this is $149/month.
+                </p>
+                <p>
+                    Another potential extension would be to implement hashtag searching. This would work in much the
+                    same
+                    way as the current user search, but it will retrieve and display all users who have recently
+                    tweeted a given hashtag. Given enough time, we may also try to update the mentions in real-time,
+                    however this involves switching from the current Twitter API to the streaming API.
+                </p>
+            </div>
+            <hr>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
